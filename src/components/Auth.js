@@ -26,7 +26,7 @@ const AuthPage = () => {
     e.preventDefault();
     alert(`Login with Email: ${email}, Password: ${password}`);
     localStorage.setItem('isAuthenticated', 'true');
-    navigate('/Dashboard/home');
+    navigate('/dashboard');
 };
 
   const handleSignupSubmit = (e) => {

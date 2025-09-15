@@ -7,18 +7,22 @@ import Contact from '../src/app/contact';
 import AuthPage from '../src/components/Auth';
 import PrivateRoute from './components/PrivateRoute';
 import DashboardLayout from './app/sidebar';
-
-
+import Report from './app/report';
+import Settings from './app/settings';
 function App() {
   return (  
     <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AuthPage />} />
-          <Route path="Dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
-              <Route path="home" element={<Home />} />
+          <Route path="/" element={<PrivateRoute><DashboardLayout />
+          </PrivateRoute>}>
+              <Route path="dashboard" element={<Home />} />
               <Route path="about" element={<About />} />
               <Route path="contact" element={<Contact />} />
+              <Route path="report" element={<Report />} />
+              <Route path="settings" element={<Settings />} />
+          
           </Route>
         </Routes>
         
