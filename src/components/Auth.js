@@ -17,32 +17,144 @@ const AuthPage = () => {
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [signupName, setSignupName] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
+  const [signupHotelName, setSignupHotelName] = useState('');
+  const [signupAddress, setSignupAddress] = useState('');
+  const [signupRole, setSignupRole] = useState('hotel_manager'); // Default role
   const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   // Forgot Password
   const [forgotEmail, setForgotEmail] = useState('');
 
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    alert(`Login with Email: ${email}, Password: ${password}`);
-    localStorage.setItem('isAuthenticated', 'true');
-    navigate('/dashboard');
-};
+  // Error states
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const handleSignupSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (signupPassword !== signupConfirmPassword) {
-      alert("Passwords do not match");
-      return;
+    setLoading(true);
+    setErrors({});
+
+    try {
+      const response = await fetch('http://localhost:5000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        
+        navigate('/dashboard');
+      } else {
+        setErrors(data.errors || { general: data.message });
+      }
+    } catch (error) {
+      setErrors({ general: 'Network error. Please try again.' });
+    } finally {
+      setLoading(false);
     }
-    alert(`Signup with Name: ${signupName}, Email: ${signupEmail}`);
-    setView('login');
   };
 
-  const handleForgotSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    alert(`Password reset link would be sent to ${forgotEmail}`);
-    setView('login');
+    setLoading(true);
+    setErrors({});
+
+    // Frontend validation
+    if (signupPassword !== signupConfirmPassword) {
+      setErrors({ confirmPassword: 'Passwords do not match' });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: signupEmail,
+          password: signupPassword,
+          fullName: signupName,
+          phone: signupPhone,
+          hotelName: signupHotelName,
+          address: signupAddress,
+          role: signupRole
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.data));
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        alert('Account created successfully! Please login.');
+        setView('login');
+        
+        // Reset form
+        setSignupEmail('');
+        setSignupPassword('');
+        setSignupConfirmPassword('');
+        setSignupName('');
+        setSignupPhone('');
+        setSignupHotelName('');
+        setSignupAddress('');
+      } else {
+        setErrors(data.errors || { general: data.message });
+      }
+    } catch (error) {
+      setErrors({ general: 'Network error. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrors({});
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('If an account exists with this email, a reset link will be sent.');
+        setView('login');
+        setForgotEmail('');
+      } else {
+        setErrors(data.errors || { general: data.message });
+      }
+    } catch (error) {
+      setErrors({ general: 'Network error. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearErrors = () => {
+    setErrors({});
   };
 
   return (
@@ -50,7 +162,10 @@ const AuthPage = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {view !== 'login' && (
           <button 
-            onClick={() => setView('login')}
+            onClick={() => {
+              setView('login');
+              clearErrors();
+            }}
             className="flex items-center text-indigo-600 hover:text-indigo-500 mb-4"
           >
             <FaArrowLeft className="mr-2" /> Back to login
@@ -67,7 +182,10 @@ const AuthPage = () => {
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
             <button 
-              onClick={() => setView('signup')}
+              onClick={() => {
+                setView('signup');
+                clearErrors();
+              }}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               create a new account
@@ -78,6 +196,13 @@ const AuthPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+
+          {/* Error Display */}
+          {errors.general && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {errors.general}
+            </div>
+          )}
 
           {/* LOGIN */}
           {view === 'login' && (
@@ -91,9 +216,15 @@ const AuthPage = () => {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
               </div>
 
               <div>
@@ -106,8 +237,13 @@ const AuthPage = () => {
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      clearErrors();
+                    }}
+                    className={`w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
                   <button
                     type="button"
@@ -117,6 +253,7 @@ const AuthPage = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
               </div>
 
               <div className="flex items-center justify-between">
@@ -136,7 +273,10 @@ const AuthPage = () => {
                 <div className="text-sm">
                   <button
                     type="button"
-                    onClick={() => setView('forgot')}
+                    onClick={() => {
+                      setView('forgot');
+                      clearErrors();
+                    }}
                     className="text-indigo-600 hover:text-indigo-500"
                   >
                     Forgot your password?
@@ -146,9 +286,10 @@ const AuthPage = () => {
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow-sm text-sm"
+                disabled={loading}
+                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded shadow-sm text-sm font-medium"
               >
-                Sign in
+                {loading ? 'Signing in...' : 'Sign in'}
               </button>
             </form>
           )}
@@ -158,34 +299,130 @@ const AuthPage = () => {
             <form className="space-y-6" onSubmit={handleSignupSubmit}>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   id="name"
                   type="text"
                   required
                   value={signupName}
-                  onChange={(e) => setSignupName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => {
+                    setSignupName(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.fullName ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
               </div>
+
               <div>
                 <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700">
-                  Email address
+                  Email address *
                 </label>
                 <input
                   id="signup-email"
                   type="email"
                   required
                   value={signupEmail}
-                  onChange={(e) => setSignupEmail(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => {
+                    setSignupEmail(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  Phone Number *
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  required
+                  value={signupPhone}
+                  onChange={(e) => {
+                    setSignupPhone(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.phone ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="hotelName" className="block text-sm font-medium text-gray-700">
+                  Hotel Name *
+                </label>
+                <input
+                  id="hotelName"
+                  type="text"
+                  required
+                  value={signupHotelName}
+                  onChange={(e) => {
+                    setSignupHotelName(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.hotelName ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.hotelName && <p className="mt-1 text-sm text-red-600">{errors.hotelName}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                  Address *
+                </label>
+                <textarea
+                  id="address"
+                  required
+                  value={signupAddress}
+                  onChange={(e) => {
+                    setSignupAddress(e.target.value);
+                    clearErrors();
+                  }}
+                  rows={3}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.address ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                  Role *
+                </label>
+                <select
+                  id="role"
+                  required
+                  value={signupRole}
+                  onChange={(e) => {
+                    setSignupRole(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.role ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="hotel_manager">Hotel Manager</option>
+                  <option value="Admin">Admin</option>
+                  <option value="User">User</option>
+                </select>
+                {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
               </div>
 
               <div>
                 <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700">
-                  Password
+                  Password *
                 </label>
                 <div className="relative mt-1">
                   <input
@@ -193,8 +430,13 @@ const AuthPage = () => {
                     type={showSignupPassword ? "text" : "password"}
                     required
                     value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    className="w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    onChange={(e) => {
+                      setSignupPassword(e.target.value);
+                      clearErrors();
+                    }}
+                    className={`w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
                   <button
                     type="button"
@@ -204,27 +446,35 @@ const AuthPage = () => {
                     {showSignupPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
               </div>
 
               <div>
                 <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
+                  Confirm Password *
                 </label>
                 <input
                   id="confirm-password"
                   type="password"
                   required
                   value={signupConfirmPassword}
-                  onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => {
+                    setSignupConfirmPassword(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow-sm text-sm"
+                disabled={loading}
+                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded shadow-sm text-sm font-medium"
               >
-                Create account
+                {loading ? 'Creating Account...' : 'Create account'}
               </button>
             </form>
           )}
@@ -241,9 +491,15 @@ const AuthPage = () => {
                   type="email"
                   required
                   value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onChange={(e) => {
+                    setForgotEmail(e.target.value);
+                    clearErrors();
+                  }}
+                  className={`mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 <p className="mt-2 text-sm text-gray-500">
                   Enter your email to receive a reset link.
                 </p>
@@ -251,9 +507,10 @@ const AuthPage = () => {
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow-sm text-sm"
+                disabled={loading}
+                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded shadow-sm text-sm font-medium"
               >
-                Send reset link
+                {loading ? 'Sending...' : 'Send reset link'}
               </button>
             </form>
           )}
@@ -261,7 +518,10 @@ const AuthPage = () => {
           {view === 'login' && (
             <div className="mt-6 text-center text-sm">
               <button
-                onClick={() => setView('signup')}
+                onClick={() => {
+                  setView('signup');
+                  clearErrors();
+                }}
                 className="text-indigo-600 hover:text-indigo-500"
               >
                 Don't have an account? Sign up

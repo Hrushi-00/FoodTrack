@@ -70,8 +70,17 @@ export default function Sidebar() {
           <Link to="/report" className="flex items-center gap-2 hover:text-gray-300">
             <FaCog /> Report
           </Link>
+          <Link to="/employees" className="flex items-center gap-2 hover:text-gray-300">
+            <FaCog /> Employees
+          </Link>
           <Link to="/settings" className="flex items-center gap-2 hover:text-gray-300">
             <FaCog /> Settings
+          </Link>
+          <Link to="/token" className="flex items-center gap-2 hover:text-gray-300">
+            <FaCog /> Token Generation
+          </Link>
+          <Link to="/token-list" className="flex items-center gap-2 hover:text-gray-300">
+            <FaCog /> Token List
           </Link>
           <button
             onClick={handleLogout}

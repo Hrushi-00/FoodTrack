@@ -8,7 +8,10 @@ import AuthPage from '../src/components/Auth';
 import PrivateRoute from './components/PrivateRoute';
 import DashboardLayout from './app/sidebar';
 import Report from './app/report';
-import Settings from './app/settings';
+import Settings from './app/settings';  
+import Token from './app/token';
+import Employees from './app/employee';
+
 function App() {
   return (  
     <div>
@@ -22,6 +25,9 @@ function App() {
               <Route path="contact" element={<Contact />} />
               <Route path="report" element={<Report />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="token" element={<Token />} />
+              <Route path="employees" element={<Employees />} />
+             
           
           </Route>
         </Routes>
