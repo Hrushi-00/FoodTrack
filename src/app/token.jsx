@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, List, X, Printer, Trash2 } from 'lucide-react';
 
-// API Base URL - Update this to your backend URL
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('generate');
@@ -11,7 +10,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  // Multiple forms state
+
   const [forms, setForms] = useState([
     {
       id: 1,
@@ -176,28 +175,28 @@ const App = () => {
   };
 
   // Fetch all tokens
-  const fetchAllTokens = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/tokens/my-tokens`, {
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`
-        }
-      });
+  // const fetchAllTokens = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await fetch(`${API_URL}/tokens/my-tokens`, {
+  //       headers: {
+  //         'Authorization': `Bearer ${getAuthToken()}`
+  //       }
+  //     });
 
-      if (response.ok) {
-        const data = await response.json();
-        setTokens(data);
-      } else {
-        setTokens([]);
-        showMessage('error', 'No tokens found');
-      }
-    } catch (error) {
-      showMessage('error', 'Failed to fetch tokens');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setTokens(data);
+  //     } else {
+  //       setTokens([]);
+  //       showMessage('error', 'No tokens found');
+  //     }
+  //   } catch (error) {
+  //     showMessage('error', 'Failed to fetch tokens');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Calculate totals for display
   const calculateTotals = (items) => {
@@ -208,13 +207,13 @@ const App = () => {
   };
 
   // Auto-fetch when switching tabs
-  useEffect(() => {
-    if (activeTab === 'byDate') {
-      fetchTokensByDate();
-    } else if (activeTab === 'all') {
-      fetchAllTokens();
-    }
-  }, [activeTab]);
+  // useEffect(() => {
+  //   if (activeTab === 'byDate') {
+  //     fetchTokensByDate();
+  //   } else if (activeTab === 'all') {
+  //     fetchAllTokens();
+  //   }
+  // }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
