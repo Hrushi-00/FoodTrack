@@ -50,7 +50,7 @@ const Employees = () => {
   // Fetch employees
   const fetchEmployees = async () => {
     try {
-      const response = await fetch(`${API_URL}/employees`, {
+      const response = await fetch(`${API_URL}/api/employees`, {
         headers: {
           'Authorization': `Bearer ${getAuthToken()}`
         }
@@ -79,7 +79,7 @@ const Employees = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/employees/add`, {
+      const response = await fetch(`${API_URL}/api/employees/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ const Employees = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/employees/${selectedEmployee._id}`, {
+      const response = await fetch(`${API_URL}/api/employees/${selectedEmployee._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ const Employees = () => {
   const handleDeleteEmployee = async (employeeId, employeeName) => {
     if (window.confirm(`Are you sure you want to delete ${employeeName}?`)) {
       try {
-        const response = await fetch(`${API_URL}/employees/${employeeId}`, {
+        const response = await fetch(`${API_URL}/api/employees/${employeeId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${getAuthToken()}`

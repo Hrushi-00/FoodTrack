@@ -22,7 +22,7 @@ const MenuManagement = () => {
   const fetchMyMenu = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/menu/getmenu`, {
+      const response = await fetch(`${API_URL}/api/menu/getmenu`, {
         headers: {
           'Authorization': `Bearer ${getAuthToken()}`
         }
@@ -95,7 +95,7 @@ const MenuManagement = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/menu/add`, {
+      const response = await fetch(`${API_URL}/api/menu/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ const MenuManagement = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/menu/update`, {
+      const response = await fetch(`${API_URL}/api/menu/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

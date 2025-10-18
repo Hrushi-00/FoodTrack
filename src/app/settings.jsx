@@ -41,7 +41,7 @@ const Settings = () => {
   // Fetch profile data
   const fetchProfile = async () => {
     try {
-      const response = await fetch(`${API_URL}/auth/users/profile`, {
+      const response = await fetch(`${API_URL}/api/auth/users/profile`, {
         headers: {
           'Authorization': `Bearer ${getAuthToken()}`
         }
@@ -75,7 +75,7 @@ const Settings = () => {
     setErrors({});
 
     try {
-      const response = await fetch(`${API_URL}/auth/users/update-profile`, {
+      const response = await fetch(`${API_URL}/api/auth/users/update-profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const Settings = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/auth/users/change-password`, {
+      const response = await fetch(`${API_URL}/api/auth/users/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

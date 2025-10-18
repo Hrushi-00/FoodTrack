@@ -34,7 +34,7 @@ const Dashboard = () => {
       setRefreshing(true);
       
       // Fetch stats
-      const statsResponse = await fetch(`${API_URL}/dashboard/stats`, {
+      const statsResponse = await fetch(`${API_URL}/api/dashboard/stats`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       
@@ -55,7 +55,7 @@ const Dashboard = () => {
       }
 
       // Fetch popular items
-      const popularResponse = await fetch(`${API_URL}/dashboard/popular-items`, {
+      const popularResponse = await fetch(`${API_URL}/api/dashboard/popular-items`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       
@@ -72,7 +72,7 @@ const Dashboard = () => {
       }
 
       // Fetch recent activity
-      const activityResponse = await fetch(`${API_URL}/dashboard/recent-activity`, {
+      const activityResponse = await fetch(`${API_URL}/api/dashboard/recent-activity`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       

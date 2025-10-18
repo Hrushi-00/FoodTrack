@@ -32,7 +32,7 @@ export default function Sidebar() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get(`${API_URL}/auth/users/profile`, {
+        const { data } = await axios.get(`${API_URL}/api/auth/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

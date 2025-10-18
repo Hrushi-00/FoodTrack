@@ -28,7 +28,7 @@ console.log("Reset token:", token);
 
   try {
     setLoading(true);
-    const { data } = await axios.post(`${API_URL}/auth/users/reset-password`, {
+    const { data } = await axios.post(`${API_URL}/api/auth/users/reset-password`, {
       token, // send token from URL
       password: formData.password,
     });

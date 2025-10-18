@@ -31,7 +31,7 @@ const TokenViewer = () => {
     setLoading(true);
     try {
       const [year, month, day] = selectedDate.split('-');
-      const response = await fetch(`${API_URL}/tokens/date/${year}/${month}/${day}`, {
+      const response = await fetch(`${API_URL}/api/tokens/date/${year}/${month}/${day}`, {
         headers: {
           'Authorization': `Bearer ${getAuthToken()}`
         }
@@ -60,7 +60,7 @@ const TokenViewer = () => {
   const fetchAllTokens = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/tokens/my-tokens`, {
+      const response = await fetch(`${API_URL}/api/tokens/my-tokens`, {
         headers: {
           'Authorization': `Bearer ${getAuthToken()}`
         }

@@ -46,7 +46,7 @@ const EmployeeDetails = () => {
   const fetchEmployeeDetails = async () => {
     try {
       setRefreshing(true);
-      const response = await fetch(`${API_URL}/employees/report/payments`, {
+      const response = await fetch(`${API_URL}/api/employees/report/payments`, {
         headers: {
           'Authorization': `Bearer ${getAuthToken()}`
         }
@@ -76,7 +76,7 @@ const EmployeeDetails = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/employees/${employeeId}/leave`, {
+      const response = await fetch(`${API_URL}/api/employees/${employeeId}/leave`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const EmployeeDetails = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/employees/${employeeId}/payment`, {
+      const response = await fetch(`${API_URL}/api/employees/${employeeId}/payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

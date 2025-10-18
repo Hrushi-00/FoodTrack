@@ -38,7 +38,7 @@ const AuthPage = () => {
     setErrors({});
 
     try {
-      const response = await fetch(`${API_URL}/auth/users/login`, {
+      const response = await fetch(`${API_URL}/api/auth/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const AuthPage = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/auth/users/signup`, {
+      const response = await fetch(`${API_URL}/api/auth/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ const AuthPage = () => {
     setErrors({});
 
     try {
-      const response = await fetch(`${API_URL}/auth/users/forgot-password`, {
+      const response = await fetch(`${API_URL}/api/auth/users/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
