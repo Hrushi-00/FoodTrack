@@ -1,54 +1,128 @@
-import { useState } from "react";
-import { FaBars, FaTimes, FaHome, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
-import { useNavigate, Outlet, Link } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { 
+  FaBars, 
+  FaTimes, 
+  FaHome, 
+  FaUser, 
+  FaCog, 
+  FaSignOutAlt,
+  FaQrcode,
+  FaList,
+  FaUsers,
+  FaUtensils
+} from "react-icons/fa";
+import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
+import axios from "axios";
+const API_URL = process.env.REACT_APP_API_URL;
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hotelName, setHotelName] = useState("Restaurant");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/");
   };
 
+  // Fetch hotel name from profile API
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const { data } = await axios.get(`${API_URL}/auth/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (data.hotelName) setHotelName(data.hotelName);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const menuItems = [
+    { path: "/dashboard", label: "Dashboard", icon: FaHome },
+    { path: "/token", label: "Generate Token", icon: FaQrcode },
+    { path: "/menu", label: "Menu Management", icon: FaUtensils },
+    { path: "/token-list", label: "Token List", icon: FaList },
+    { path: "/employees", label: "Employees", icon: FaUsers },
+    { path: "/settings", label: "Settings", icon: FaCog },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Top Navbar on Mobile */}
-      <nav className="w-full bg-gray-800 text-white flex items-center justify-between px-4 py-3 md:hidden fixed top-0 left-0 z-40">
-        <h1 className="text-xl font-bold">My App</h1>
-        {/* Toggle icon -- hamburger when closed, cross when open */}
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Top Navbar (Mobile) */}
+      <nav className="w-full bg-white border-b border-gray-200 text-gray-800 flex items-center justify-between px-4 py-3 md:hidden fixed top-0 left-0 z-40 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">R</span>
+          </div>
+          <h1 className="text-lg font-semibold">{hotelName}</h1>
+        </div>
         {isOpen ? (
-          <FaTimes className="text-xl cursor-pointer" onClick={() => setIsOpen(false)} />
+          <FaTimes className="text-xl cursor-pointer text-gray-600" onClick={() => setIsOpen(false)} />
         ) : (
-          <FaBars className="text-xl cursor-pointer" onClick={() => setIsOpen(true)} />
+          <FaBars className="text-xl cursor-pointer text-gray-600" onClick={() => setIsOpen(true)} />
         )}
       </nav>
 
-      {/* Slide-out Drawer for Mobile */}
+      {/* Mobile Sidebar Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsOpen(false)} />
-          {/* Drawer */}
-          <div className="absolute top-0 left-0 w-64 h-full bg-gray-800 text-white">
-            <nav className="flex flex-col p-4 space-y-4 mt-10">
-              <Link to="/Dashboard/home" className="flex items-center gap-2 hover:text-gray-300" onClick={() => setIsOpen(false)}>
-                <FaHome /> DashBoard
-              </Link>
-              <Link to="/Dashboard/about" className="flex items-center gap-2 hover:text-gray-300" onClick={() => setIsOpen(false)}>
-                <FaUser /> Menu Overview
-              </Link>
-              <Link to="/Dashboard/report" className="flex items-center gap-2 hover:text-gray-300" onClick={() => setIsOpen(false)}>
-                <FaCog /> Report
-              </Link>
-              <Link to="/Dashboard/settings" className="flex items-center gap-2 hover:text-gray-300" onClick={() => setIsOpen(false)}>
-                <FaCog /> Settings
-              </Link>
+          <div 
+            className="absolute inset-0 bg-black bg-opacity-50" 
+            onClick={() => setIsOpen(false)} 
+          />
+          <div className="absolute top-0 left-0 w-80 h-full bg-white shadow-xl">
+            {/* Mobile Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold">R</span>
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold text-gray-900">{hotelName}</h1>
+                  <p className="text-sm text-gray-500">Admin Panel</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            <nav className="flex flex-col p-4 space-y-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActive(item.path)
+                        ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Icon className={`${isActive(item.path) ? "text-blue-600" : "text-gray-400"}`} />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+              
+              {/* Logout Button */}
               <button
                 onClick={() => { setIsOpen(false); handleLogout(); }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg transition-all duration-200 shadow-sm mt-4"
+                className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 mt-4"
               >
-                <FaSignOutAlt className="h-4 w-4" /> Logout
+                <FaSignOutAlt className="text-red-500" />
+                <span className="font-medium">Logout</span>
               </button>
             </nav>
           </div>
@@ -56,43 +130,55 @@ export default function Sidebar() {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white z-30">
-        <div className="flex justify-between items-center p-4 border-b border-gray-700">
-          <h1 className="text-xl font-bold">My App</h1>
+      <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-72 bg-white border-r border-gray-200 text-gray-800 z-30">
+        {/* Sidebar Header */}
+        <div className="flex items-center gap-4 p-6 border-b border-gray-200">
+          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-lg">R</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">{hotelName}</h1>
+            <p className="text-sm text-gray-500">Management System</p>
+          </div>
         </div>
-        <nav className="flex flex-col p-4 space-y-4">
-          <Link to="/dashboard" className="flex items-center gap-2 hover:text-gray-300">
-            <FaHome /> DashBoard
-          </Link>
-          <Link to="/about" className="flex items-center gap-2 hover:text-gray-300">
-            <FaUser /> Menu Overview
-          </Link>
-          <Link to="/report" className="flex items-center gap-2 hover:text-gray-300">
-            <FaCog /> Report
-          </Link>
-          <Link to="/employees" className="flex items-center gap-2 hover:text-gray-300">
-            <FaCog /> Employees
-          </Link>
-          <Link to="/settings" className="flex items-center gap-2 hover:text-gray-300">
-            <FaCog /> Settings
-          </Link>
-          <Link to="/token" className="flex items-center gap-2 hover:text-gray-300">
-            <FaCog /> Token Generation
-          </Link>
-          <Link to="/token-list" className="flex items-center gap-2 hover:text-gray-300">
-            <FaCog /> Token List
-          </Link>
+
+        {/* Navigation */}
+        <nav className="flex-1 flex flex-col p-4 space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  isActive(item.path)
+                    ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600 font-semibold"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+              >
+                <Icon 
+                  className={`text-lg ${isActive(item.path) ? "text-blue-600" : "text-gray-400"}`} 
+                />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout Section */}
+        <div className="p-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg transition-all duration-200 shadow-sm mt-4"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium"
           >
-            <FaSignOutAlt className="h-4 w-4" /> Logout
+            <FaSignOutAlt className="text-red-500" />
+            Logout
           </button>
-        </nav>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 mt-16 md:mt-0 p-4">
+      <main className="flex-1 md:ml-72 mt-16 md:mt-0 p-6">
         <Outlet />
       </main>
     </div>
