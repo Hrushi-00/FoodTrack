@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, Edit, X, Menu as MenuIcon, } from 'lucide-react';
-import {   FaUtensils} from "react-icons/fa";
+import { Plus, Trash2, Save, Edit, X, Menu as MenuIcon } from 'lucide-react';
+import { FaUtensils } from "react-icons/fa";
+
 const API_URL = process.env.REACT_APP_API_URL;
 
 const MenuManagement = () => {
@@ -8,6 +9,7 @@ const MenuManagement = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [editing, setEditing] = useState(false);
+  const [isNewMenu, setIsNewMenu] = useState(false);
 
   // Get JWT token from localStorage
   const getAuthToken = () => localStorage.getItem('token');
@@ -31,8 +33,10 @@ const MenuManagement = () => {
       if (response.ok) {
         const data = await response.json();
         setMenu(data);
+        setIsNewMenu(data.items.length === 0);
       } else {
         setMenu({ items: [] });
+        setIsNewMenu(true);
       }
     } catch (error) {
       showMessage('error', 'Failed to fetch menu');
@@ -110,6 +114,7 @@ const MenuManagement = () => {
         const data = await response.json();
         showMessage('success', data.message);
         setEditing(false);
+        setIsNewMenu(false);
         fetchMyMenu();
       } else {
         const errorData = await response.json();
@@ -172,6 +177,10 @@ const MenuManagement = () => {
   // Start editing
   const startEditing = () => {
     setEditing(true);
+    // If we have existing items, it's not a new menu
+    if (menu.items.length > 0) {
+      setIsNewMenu(false);
+    }
   };
 
   // Cancel editing
@@ -211,7 +220,8 @@ const MenuManagement = () => {
             {message.text}
           </div>
         )}
-   {/* Menu Preview */}
+
+        {/* Menu Preview */}
         {!editing && menu.items.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Menu Preview</h3>
@@ -233,6 +243,7 @@ const MenuManagement = () => {
             </div>
           </div>
         )}
+
         {/* Main Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {/* Header Actions */}
@@ -263,12 +274,12 @@ const MenuManagement = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={menu.items.length === 0 ? saveMenu : updateMenu}
+                    onClick={isNewMenu ? saveMenu : updateMenu}
                     disabled={loading}
                     className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
                   >
                     <Save size={20} />
-                    {loading ? 'Saving...' : (menu.items.length === 0 ? 'Save Menu' : 'Update Menu')}
+                    {loading ? 'Saving...' : (isNewMenu ? 'Save Menu' : 'Update Menu')}
                   </button>
                 </>
               )}
@@ -322,7 +333,7 @@ const MenuManagement = () => {
                           type="text"
                           value={item.menuItemId}
                           onChange={(e) => updateMenuItem(index, 'menuItemId', e.target.value.toUpperCase())}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase font-mono text-center"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-center"
                           placeholder="R1, C1"
                         />
                       ) : (
@@ -409,8 +420,6 @@ const MenuManagement = () => {
             </div>
           )}
         </div>
-
-     
       </div>
     </div>
   );
