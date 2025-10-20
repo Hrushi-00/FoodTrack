@@ -6,7 +6,8 @@ const API_URL = process.env.REACT_APP_API_URL;
 const App = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-
+  const [isNewMenu, setIsNewMenu] = useState(false);
+  const [menu, setMenu] = useState({ items: [] });
   // Initialize forms from localStorage or with default value
   const [forms, setForms] = useState(() => {
     const savedForms = localStorage.getItem('multiTableForms');
@@ -31,6 +32,30 @@ const App = () => {
   const showMessage = (type, text) => {
     setMessage({ type, text });
     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+  };
+
+ const fetchMyMenu = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/menu/getmenu`, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMenu(data);
+        setIsNewMenu(data.items.length === 0);
+      } else {
+        setMenu({ items: [] });
+        setIsNewMenu(true);
+      }
+    } catch (error) {
+      showMessage('error', 'Failed to fetch menu');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Add new form
@@ -168,7 +193,15 @@ const App = () => {
       setLoading(false);
     }
   };
+ const cancelEditing = () => {
+    // setEditing(false);
+    fetchMyMenu();
+  };
 
+  // Load menu on component mount
+  useEffect(() => {
+    fetchMyMenu();
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
@@ -195,6 +228,28 @@ const App = () => {
             {message.text}
           </div>
         )}
+
+{/* Menu Preview */}
+      
+   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mt-4">
+  <h3 className="text-sm font-bold text-gray-800 mb-2">Menu Preview</h3>
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+    {menu.items.map((item, index) => (
+      <div key={index} className="border border-gray-200 rounded-md p-2 bg-white hover:shadow-sm transition-shadow">
+        <div className="flex justify-between items-start mb-1">
+          <span className="font-mono font-bold text-blue-800 bg-blue-100 px-1 py-0.5 rounded text-xs">
+            {item.menuItemId}
+          </span>
+          <span className="font-bold text-green-600 text-sm">₹{item.price.toFixed(2)}</span>
+        </div>
+        <h4 className="font-medium text-gray-800 text-xs">{item.name}</h4>
+      </div>
+    ))}
+  </div>
+  <div className="mt-2 text-center text-xs text-gray-500">
+    {menu.items.length} menu item{menu.items.length !== 1 ? 's' : ''} available for ordering
+  </div>
+</div>
 
         {/* Control Bar */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
