@@ -425,7 +425,7 @@ const AuthPage = () => {
                     }`}
                   >
                     <option value="hotel_manager">Restaurant Manager</option>
-                    <option value="Admin">Admin</option>
+                    {/* <option value="Admin">Admin</option> */}
                     <option value="User">User</option>
                   </select>
                   {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
