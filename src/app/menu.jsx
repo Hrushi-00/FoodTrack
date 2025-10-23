@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, Edit, X, Menu as MenuIcon } from 'lucide-react';
-import { FaUtensils } from "react-icons/fa";
+import { Plus, X, Save, Edit, Trash2, Search } from 'lucide-react';
+import { FaUtensils } from 'react-icons/fa';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 const MenuManagement = () => {
-  const [menu, setMenu] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [editing, setEditing] = useState(false);
   const [isNewMenu, setIsNewMenu] = useState(false);
+  const [menu, setMenu] = useState({ items: [] });
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Get JWT token from localStorage
   const getAuthToken = () => localStorage.getItem('token');
@@ -20,7 +21,7 @@ const MenuManagement = () => {
     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   };
 
-  // Fetch current user's menu
+  // Fetch menu from API
   const fetchMyMenu = async () => {
     setLoading(true);
     try {
@@ -45,15 +46,64 @@ const MenuManagement = () => {
     }
   };
 
+  // Filter menu items based on search term
+  const filteredMenuItems = menu.items.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.menuItemId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Create new menu
+  const createNewMenu = () => {
+    setIsNewMenu(true);
+    setEditing(true);
+    // Start with one empty item for new menus
+    setMenu({ items: [{ menuItemId: '', name: '', price: 0 }] });
+  };
+
+  // Edit existing menu
+  const editExistingMenu = () => {
+    setIsNewMenu(false);
+    setEditing(true);
+  };
+
+  // Cancel editing
+  const cancelEditing = () => {
+    setEditing(false);
+    if (isNewMenu) {
+      // If we were creating a new menu, fetch the original data back
+      fetchMyMenu();
+    } else {
+      // If we were editing existing menu, just reset editing mode
+      setEditing(false);
+    }
+  };
+
   // Add new menu item
   const addMenuItem = () => {
-    setMenu(prev => ({
-      ...prev,
-      items: [
-        ...prev.items,
-        { menuItemId: '', name: '', price: 0 }
-      ]
+    const newItem = {
+      menuItemId: '',
+      name: '',
+      price: 0
+    };
+    setMenu(prevMenu => ({
+      ...prevMenu,
+      items: [...prevMenu.items, newItem]
     }));
+  };
+
+  // Update menu item
+  const updateMenuItem = (index, field, value) => {
+    setMenu(prevMenu => {
+      const newItems = [...prevMenu.items];
+      if (field === 'price') {
+        newItems[index][field] = parseFloat(value) || 0;
+      } else if (field === 'menuItemId') {
+        newItems[index][field] = value.toLowerCase();
+      } else {
+        newItems[index][field] = value;
+      }
+      return { ...prevMenu, items: newItems };
+    });
   };
 
   // Remove menu item
@@ -62,63 +112,57 @@ const MenuManagement = () => {
       showMessage('error', 'At least one menu item is required');
       return;
     }
-    setMenu(prev => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index)
+    setMenu(prevMenu => ({
+      ...prevMenu,
+      items: prevMenu.items.filter((_, i) => i !== index)
     }));
   };
 
-  // Update menu item
-  const updateMenuItem = (index, field, value) => {
-    const newItems = [...menu.items];
-    if (field === 'price') {
-      newItems[index][field] = parseFloat(value) || 0;
-    } else {
-      newItems[index][field] = value;
-    }
-    setMenu(prev => ({ ...prev, items: newItems }));
-  };
-
-  // Save menu (for new menu)
-  const saveMenu = async () => {
+  // Validate menu items
+  const validateMenu = () => {
+    // Check for empty fields
     const hasEmptyFields = menu.items.some(item => 
-      !item.menuItemId || !item.name || item.price <= 0
+      !item.menuItemId.trim() || !item.name.trim() || item.price <= 0
     );
     
     if (hasEmptyFields) {
-      showMessage('error', 'Please fill all fields for all menu items');
-      return;
+      showMessage('error', 'Please fill all fields and ensure price is greater than 0');
+      return false;
     }
 
+    // Check for duplicate menu item IDs
     const menuItemIds = menu.items.map(item => item.menuItemId);
     const uniqueIds = new Set(menuItemIds);
     if (uniqueIds.size !== menuItemIds.length) {
       showMessage('error', 'Menu item codes must be unique');
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  // Save new menu
+  const saveMenu = async () => {
+    if (!validateMenu()) return;
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/menu/add`, {
+      const response = await fetch(`${API_URL}/api/menu/createmenu`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getAuthToken()}`
         },
-        body: JSON.stringify({
-          items: menu.items
-        })
+        body: JSON.stringify(menu)
       });
 
       if (response.ok) {
-        const data = await response.json();
-        showMessage('success', data.message);
+        showMessage('success', 'Menu created successfully!');
         setEditing(false);
-        setIsNewMenu(false);
         fetchMyMenu();
       } else {
         const errorData = await response.json();
-        showMessage('error', errorData.message || 'Failed to save menu');
+        showMessage('error', errorData.message || 'Failed to create menu');
       }
     } catch (error) {
       showMessage('error', 'Network error. Please try again.');
@@ -127,40 +171,23 @@ const MenuManagement = () => {
     }
   };
 
-  // Update menu (for existing menu)
+  // Update existing menu
   const updateMenu = async () => {
-    const hasEmptyFields = menu.items.some(item => 
-      !item.menuItemId || !item.name || item.price <= 0
-    );
-    
-    if (hasEmptyFields) {
-      showMessage('error', 'Please fill all fields for all menu items');
-      return;
-    }
-
-    const menuItemIds = menu.items.map(item => item.menuItemId);
-    const uniqueIds = new Set(menuItemIds);
-    if (uniqueIds.size !== menuItemIds.length) {
-      showMessage('error', 'Menu item codes must be unique');
-      return;
-    }
+    if (!validateMenu()) return;
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/menu/update`, {
+      const response = await fetch(`${API_URL}/api/menu/updatemenu`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getAuthToken()}`
         },
-        body: JSON.stringify({
-          items: menu.items
-        })
+        body: JSON.stringify(menu)
       });
 
       if (response.ok) {
-        const data = await response.json();
-        showMessage('success', data.message);
+        showMessage('success', 'Menu updated successfully!');
         setEditing(false);
         fetchMyMenu();
       } else {
@@ -174,25 +201,54 @@ const MenuManagement = () => {
     }
   };
 
-  // Start editing
-  const startEditing = () => {
-    setEditing(true);
-    // If we have existing items, it's not a new menu
-    if (menu.items.length > 0) {
-      setIsNewMenu(false);
-    }
-  };
-
-  // Cancel editing
-  const cancelEditing = () => {
-    setEditing(false);
-    fetchMyMenu();
-  };
-
   // Load menu on component mount
   useEffect(() => {
     fetchMyMenu();
   }, []);
+
+  // Separate button components for better organization
+  const CreateMenuButton = ({ onCreate, disabled = false }) => (
+    <button
+      onClick={onCreate}
+      disabled={disabled}
+      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+    >
+      <Plus size={20} />
+      Create New Menu
+    </button>
+  );
+
+  const EditMenuButton = ({ onEdit, disabled = false }) => (
+    <button
+      onClick={onEdit}
+      disabled={disabled}
+      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+    >
+      <Edit size={20} />
+      Edit Current Menu
+    </button>
+  );
+
+  const SaveButton = ({ onSave, loading, isNewMenu }) => (
+    <button
+      onClick={onSave}
+      disabled={loading}
+      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
+    >
+      <Save size={20} />
+      {loading ? 'Saving...' : (isNewMenu ? 'Save New Menu' : 'Update Menu')}
+    </button>
+  );
+
+  const CancelButton = ({ onCancel }) => (
+    <button
+      onClick={onCancel}
+      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+    >
+      <X size={20} />
+      Cancel
+    </button>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -221,69 +277,105 @@ const MenuManagement = () => {
           </div>
         )}
 
-        {/* Menu Preview */}
+        {/* Menu Preview with Search and Actions */}
         {!editing && menu.items.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Menu Preview</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {menu.items.map((item, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="font-mono font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-lg text-sm">
-                      {item.menuItemId}
-                    </span>
-                    <span className="font-bold text-green-600 text-lg">₹{item.price.toFixed(2)}</span>
-                  </div>
-                  <h4 className="font-semibold text-gray-800">{item.name}</h4>
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800 mb-2">Menu Preview</h3>
+                
+                {/* Search Input */}
+                <div className="relative w-full max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                  <input
+                    type="text"
+                    placeholder="Search by name or code..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
                 </div>
-              ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 w-full lg:w-auto">
+                <CreateMenuButton 
+                  onCreate={createNewMenu} 
+                  disabled={loading}
+                />
+                <EditMenuButton 
+                  onEdit={editExistingMenu} 
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredMenuItems.length > 0 ? (
+                filteredMenuItems.map((item, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="font-mono font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-lg text-sm">
+                        {item.menuItemId}
+                      </span>
+                      <span className="font-bold text-green-600 text-lg">₹{item.price.toFixed(2)}</span>
+                    </div>
+                    <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  {searchTerm ? `No menu items found matching "${searchTerm}"` : 'No menu items available'}
+                </div>
+              )}
             </div>
             <div className="mt-4 text-center text-sm text-gray-500">
-              {menu.items.length} menu item{menu.items.length !== 1 ? 's' : ''} available for ordering
+              {filteredMenuItems.length} of {menu.items.length} menu item{menu.items.length !== 1 ? 's' : ''} shown
+              {searchTerm && ` • Filtered by: "${searchTerm}"`}
             </div>
           </div>
         )}
 
         {/* Main Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          {/* Header Actions */}
+          {/* Header with Actions when editing or no menu */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-gray-800">Menu Items</h2>
               <p className="text-gray-600 text-sm mt-1">
                 {menu.items.length} item{menu.items.length !== 1 ? 's' : ''} in menu
+                {isNewMenu && editing && ' • Creating new menu'}
               </p>
             </div>
             
-            <div className="flex gap-2">
-              {!editing ? (
-                <button
-                  onClick={startEditing}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                >
-                  <Edit size={20} />
-                  {menu.items.length === 0 ? 'Create Menu' : 'Edit Menu'}
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={cancelEditing}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-                  >
-                    <X size={20} />
-                    Cancel
-                  </button>
-                  <button
-                    onClick={isNewMenu ? saveMenu : updateMenu}
+            {/* Action Buttons for when there's no menu or during editing */}
+            {(editing || menu.items.length === 0) && (
+              <div className="flex gap-2">
+                {!editing ? (
+                  <CreateMenuButton 
+                    onCreate={createNewMenu} 
                     disabled={loading}
-                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
-                  >
-                    <Save size={20} />
-                    {loading ? 'Saving...' : (isNewMenu ? 'Save Menu' : 'Update Menu')}
-                  </button>
-                </>
-              )}
-            </div>
+                  />
+                ) : (
+                  <div className="flex gap-2">
+                    <CancelButton onCancel={cancelEditing} />
+                    <SaveButton 
+                      onSave={isNewMenu ? saveMenu : updateMenu}
+                      loading={loading}
+                      isNewMenu={isNewMenu}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Add Item Button */}
@@ -300,23 +392,17 @@ const MenuManagement = () => {
           )}
 
           {/* Menu Items List */}
-          {loading ? (
+          {loading && !editing ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="text-gray-600 mt-4">Loading menu...</p>
             </div>
           ) : menu.items.length === 0 && !editing ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-              <MenuIcon size={48} className="mx-auto text-gray-400 mb-4" />
+              <FaUtensils size={48} className="mx-auto text-gray-400 mb-4" />
               <p className="text-gray-500 text-lg mb-4">No menu items found</p>
-              <p className="text-gray-400 mb-6">Click "Create Menu" to start adding items to your menu</p>
-              <button
-                onClick={startEditing}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
-              >
-                <Plus size={20} />
-                Create Menu
-              </button>
+              <p className="text-gray-400 mb-6">Click "Create New Menu" to start adding items to your menu</p>
+              <CreateMenuButton onCreate={createNewMenu} />
             </div>
           ) : (
             <div className="space-y-4">
@@ -332,7 +418,7 @@ const MenuManagement = () => {
                         <input
                           type="text"
                           value={item.menuItemId}
-                          onChange={(e) => updateMenuItem(index, 'menuItemId', e.target.value.toUpperCase())}
+                          onChange={(e) => updateMenuItem(index, 'menuItemId', e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-center"
                           placeholder="R1, C1"
                         />
@@ -406,7 +492,9 @@ const MenuManagement = () => {
           {/* Instructions */}
           {editing && (
             <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h4 className="font-semibold text-blue-800 mb-3 text-lg">How to set up your menu:</h4>
+              <h4 className="font-semibold text-blue-800 mb-3 text-lg">
+                {isNewMenu ? 'Creating New Menu' : 'Editing Menu'} - Instructions:
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
                 <div className="space-y-2">
                   <p><strong>Item Code:</strong> Short code used for ordering (e.g., R1, C1)</p>
@@ -417,6 +505,13 @@ const MenuManagement = () => {
                   <p><strong>Unique Codes:</strong> Each item code must be different</p>
                 </div>
               </div>
+              {isNewMenu && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-yellow-700 text-sm">
+                    <strong>Note:</strong> You are creating a new menu. This will replace any existing menu.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
