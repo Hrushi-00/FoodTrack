@@ -157,7 +157,7 @@ const TokenViewer = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#035397] rounded-full mb-4">
             <Printer className="text-white" size={32} />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -189,7 +189,7 @@ const TokenViewer = () => {
               onClick={() => setActiveTab('byDate')}
               className={`flex-1 py-4 px-6 font-semibold transition-colors flex items-center justify-center gap-3 ${
                 activeTab === 'byDate' 
-                  ? 'bg-blue-600 text-white border-b-2 border-blue-600' 
+                  ? 'bg-[#035397] text-white border-b-2 border-[#035397]' 
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -200,7 +200,7 @@ const TokenViewer = () => {
               onClick={() => setActiveTab('all')}
               className={`flex-1 py-4 px-6 font-semibold transition-colors flex items-center justify-center gap-3 ${
                 activeTab === 'all' 
-                  ? 'bg-blue-600 text-white border-b-2 border-blue-600' 
+                  ? 'bg-[#035397] text-white border-b-2 border-[#035397]' 
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -228,7 +228,7 @@ const TokenViewer = () => {
                     <button
                       onClick={fetchTokensByDate}
                       disabled={loading}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
+                      className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
                     >
                       <Search size={20} />
                       Search
@@ -293,7 +293,7 @@ const TokenViewer = () => {
             {/* Loading State */}
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#035397] mx-auto"></div>
                 <p className="text-gray-600 mt-4">Loading tokens...</p>
               </div>
             ) : filteredTokens.length === 0 ? (

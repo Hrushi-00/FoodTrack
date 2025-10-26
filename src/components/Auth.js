@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaEye, FaEyeSlash, FaArrowLeft, FaHotel } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaArrowLeft, FaHotel, FaInfoCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -157,36 +157,61 @@ const AuthPage = () => {
     setErrors({});
   };
 
+  const handleAboutProject = () => {
+    navigate('/about');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop)',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+      </div>
+
+      {/* About Button - Top Right - Responsive */}
+      <button
+        onClick={handleAboutProject}
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 font-medium transition-all duration-300 rounded-lg border border-white/20 shadow-lg text-sm sm:text-base"
+      >
+        <FaInfoCircle className="mr-1 sm:mr-2 text-sm sm:text-base" />
+        <span className="hidden min-[400px]:inline">About This</span>
+        <span className="min-[400px]:hidden">About</span>
+      </button>
+
+      {/* Main Content */}
+      <div className="max-w-md w-full z-10">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           {view !== 'login' && (
             <button 
               onClick={() => {
                 setView('login');
                 clearErrors();
               }}
-              className="flex items-center justify-center text-gray-600 hover:text-gray-800 mb-6 mx-auto transition-colors"
+              className="flex items-center justify-center text-white hover:text-gray-200 mb-4 sm:mb-6 mx-auto transition-colors text-sm sm:text-base"
             >
               <FaArrowLeft className="mr-2" /> Back to login
             </button>
           )}
           
           <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <FaHotel className="text-white text-2xl" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#035397] rounded-2xl flex items-center justify-center shadow-lg">
+              <FaHotel className="text-white text-xl sm:text-2xl" />
             </div>
           </div>
           
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
             {view === 'login' && 'Welcome Back'}
             {view === 'signup' && 'Create Account'}
             {view === 'forgot' && 'Reset Password'}
           </h1>
           
-          <p className="text-gray-600">
+          <p className="text-gray-200 text-sm sm:text-base">
             {view === 'login' && 'Sign in to your account'}
             {view === 'signup' && 'Create your restaurant account'}
             {view === 'forgot' && 'Reset your password'}
@@ -194,7 +219,7 @@ const AuthPage = () => {
         </div>
 
         {/* Auth Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
           {/* Error Display */}
           {errors.general && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
@@ -218,7 +243,7 @@ const AuthPage = () => {
                     setEmail(e.target.value);
                     clearErrors();
                   }}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                  className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
@@ -240,7 +265,7 @@ const AuthPage = () => {
                       setPassword(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full pr-12 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full pr-12 px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.password ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your password"
@@ -256,16 +281,19 @@ const AuthPage = () => {
                 {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                {/* <label className="flex items-center cursor-pointer">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#035397]"></div>
+                  </div>
+                  <span className="ml-3 text-sm text-gray-600">Remember me</span>
+                </label> */}
 
                 <button
                   type="button"
@@ -273,7 +301,7 @@ const AuthPage = () => {
                     setView('forgot');
                     clearErrors();
                   }}
-                  className="text-sm text-blue-600 hover:text-blue-500"
+                  className="text-sm text-[#035397] hover:text-blue-500 text-left sm:text-right"
                 >
                   Forgot password?
                 </button>
@@ -282,7 +310,7 @@ const AuthPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full bg-[#035397] text-white py-2.5 sm:py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
@@ -296,7 +324,7 @@ const AuthPage = () => {
                       setView('signup');
                       clearErrors();
                     }}
-                    className="text-blue-600 hover:text-blue-500 font-medium"
+                    className="text-[#035397] hover:text-blue-500 font-medium"
                   >
                     Sign up
                   </button>
@@ -321,7 +349,7 @@ const AuthPage = () => {
                       setSignupName(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.fullName ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your full name"
@@ -341,7 +369,7 @@ const AuthPage = () => {
                       setSignupEmail(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your email"
@@ -361,7 +389,7 @@ const AuthPage = () => {
                       setSignupPhone(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.phone ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your phone number"
@@ -381,7 +409,7 @@ const AuthPage = () => {
                       setSignupHotelName(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.hotelName ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter restaurant name"
@@ -401,7 +429,7 @@ const AuthPage = () => {
                       clearErrors();
                     }}
                     rows={2}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.address ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter restaurant address"
@@ -420,12 +448,11 @@ const AuthPage = () => {
                       setSignupRole(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.role ? 'border-red-500' : 'border-gray-300'
                     }`}
                   >
                     <option value="hotel_manager">Restaurant Manager</option>
-                    {/* <option value="Admin">Admin</option> */}
                     <option value="User">User</option>
                   </select>
                   {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
@@ -444,7 +471,7 @@ const AuthPage = () => {
                         setSignupPassword(e.target.value);
                         clearErrors();
                       }}
-                      className={`w-full pr-12 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                      className={`w-full pr-12 px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                         errors.password ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="Create a password"
@@ -472,7 +499,7 @@ const AuthPage = () => {
                       setSignupConfirmPassword(e.target.value);
                       clearErrors();
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                       errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Confirm your password"
@@ -484,7 +511,7 @@ const AuthPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full bg-[#035397] text-white py-2.5 sm:py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -510,7 +537,7 @@ const AuthPage = () => {
                     setForgotEmail(e.target.value);
                     clearErrors();
                   }}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                  className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
@@ -521,7 +548,7 @@ const AuthPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full bg-[#035397] text-white py-2.5 sm:py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
@@ -530,8 +557,8 @@ const AuthPage = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-xs text-gray-500">
+        <div className="text-center mt-4 sm:mt-6">
+          <p className="text-xs sm:text-sm text-gray-200">
             © 2024 Restaurant Management System
           </p>
         </div>

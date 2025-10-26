@@ -13,7 +13,8 @@ import Token from './app/token';
 import Employees from './app/employee';
 import TokenList from './app/tokenList';
 import ResetPassword from './app/reset-password';
-import EmployeeDetails from './app/employeeDetails'; // Fixed import path
+import EmployeeDetails from './app/employeeDetails'; 
+import AboutPage from './app/about'; 
 
 function App() {
   return (  
@@ -23,7 +24,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<AuthPage />} />
           <Route path="reset-password/:token" element={<ResetPassword />} />
-          
+          <Route path="/about" element={<AboutPage />} />
           {/* Protected Routes with Dashboard Layout */}
           <Route path="/" element={
             <PrivateRoute>
@@ -31,7 +32,7 @@ function App() {
             </PrivateRoute>
           }>
             {/* These will render inside the DashboardLayout's Outlet */}
-            {/* Use relative paths (without leading slash) */}
+          
             <Route path="dashboard" element={<Home />} />
             <Route path="menu" element={<Menu />} />
             <Route path="contact" element={<Contact />} />

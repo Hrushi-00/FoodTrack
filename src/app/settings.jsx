@@ -214,7 +214,7 @@ const Settings = () => {
               onClick={() => setActiveTab('profile')}
               className={`flex-1 py-4 px-6 font-medium transition-colors flex items-center justify-center gap-2 ${
                 activeTab === 'profile' 
-                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600' 
+                  ? 'bg-blue-50 text-[#035397] border-b-2 border-[#035397]' 
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -225,7 +225,7 @@ const Settings = () => {
               onClick={() => setActiveTab('password')}
               className={`flex-1 py-4 px-6 font-medium transition-colors flex items-center justify-center gap-2 ${
                 activeTab === 'password' 
-                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600' 
+                  ? 'bg-blue-50 text-[#035397] border-b-2 border-[#035397]' 
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -340,7 +340,7 @@ const Settings = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     <FaSave className="text-lg" />
                     {loading ? 'Saving...' : 'Save Changes'}
@@ -446,7 +446,7 @@ const Settings = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     <FaKey className="text-lg" />
                     {loading ? 'Changing Password...' : 'Change Password'}

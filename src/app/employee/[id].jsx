@@ -144,7 +144,7 @@ const EmployeeDetails = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#035397] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading employee details...</p>
         </div>
       </div>
@@ -158,7 +158,7 @@ const EmployeeDetails = () => {
           <p className="text-gray-600">Employee not found</p>
           <button
             onClick={() => navigate('/employees')}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="mt-4 px-4 py-2 bg-[#035397] text-white rounded-lg hover:bg-blue-700"
           >
             Back to Employees
           </button>
@@ -210,7 +210,7 @@ const EmployeeDetails = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <User className="text-blue-600" size={32} />
+                  <User className="text-[#035397]" size={32} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">{employee.employee?.name}</h3>
                 <p className="text-gray-600">{employee.employee?.position}</p>
@@ -261,7 +261,7 @@ const EmployeeDetails = () => {
                   onClick={() => setActiveTab('payments')}
                   className={`flex-1 py-4 px-6 font-medium transition-colors flex items-center justify-center gap-2 ${
                     activeTab === 'payments' 
-                      ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600' 
+                      ? 'bg-blue-50 text-[#035397] border-b-2 border-[#035397]' 
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
@@ -272,7 +272,7 @@ const EmployeeDetails = () => {
                   onClick={() => setActiveTab('leaves')}
                   className={`flex-1 py-4 px-6 font-medium transition-colors flex items-center justify-center gap-2 ${
                     activeTab === 'leaves' 
-                      ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600' 
+                      ? 'bg-blue-50 text-[#035397] border-b-2 border-[#035397]' 
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
@@ -289,7 +289,7 @@ const EmployeeDetails = () => {
                       <h3 className="text-lg font-bold text-gray-900">Payment History</h3>
                       <button
                         onClick={() => setShowPaymentForm(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                       >
                         <Plus size={18} />
                         Add Payment
@@ -330,7 +330,7 @@ const EmployeeDetails = () => {
                       <h3 className="text-lg font-bold text-gray-900">Leave History</h3>
                       <button
                         onClick={() => setShowLeaveForm(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                       >
                         <Plus size={18} />
                         Add Leave
@@ -426,7 +426,7 @@ const EmployeeDetails = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Add Leave
                 </button>
@@ -484,7 +484,7 @@ const EmployeeDetails = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Record Payment
                 </button>

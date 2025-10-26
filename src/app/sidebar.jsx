@@ -48,7 +48,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { path: "/dashboard", label: "Dashboard", icon: FaHome },
-    { path: "/token", label: "Generate Token", icon: FaQrcode },
+    { path: "/token", label: "Generate Bill", icon: FaQrcode },
     { path: "/menu", label: "Menu Management", icon: FaUtensils },
     { path: "/token-list", label: "Token List", icon: FaList },
     { path: "/employees", label: "Employees", icon: FaUsers },
@@ -62,7 +62,7 @@ export default function Sidebar() {
       {/* Top Navbar (Mobile) */}
       <nav className="w-full bg-white border-b border-gray-200 text-gray-800 flex items-center justify-between px-4 py-3 md:hidden fixed top-0 left-0 z-40 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#035397] rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">R</span>
           </div>
           <h1 className="text-lg font-semibold">{hotelName}</h1>
@@ -85,7 +85,7 @@ export default function Sidebar() {
             {/* Mobile Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-[#035397] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold">R</span>
                 </div>
                 <div>
@@ -105,12 +105,12 @@ export default function Sidebar() {
                     to={item.path}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActive(item.path)
-                        ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600"
+                        ? "bg-blue-50 text-[#035397] border-r-2 border-[#035397]"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    <Icon className={`${isActive(item.path) ? "text-blue-600" : "text-gray-400"}`} />
+                    <Icon className={`${isActive(item.path) ? "text-[#035397]" : "text-gray-400"}`} />
                     <span className="font-medium">{item.label}</span>
                   </Link>
                 );
@@ -133,7 +133,7 @@ export default function Sidebar() {
       <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-72 bg-white border-r border-gray-200 text-gray-800 z-30">
         {/* Sidebar Header */}
         <div className="flex items-center gap-4 p-6 border-b border-gray-200">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 bg-[#035397] rounded-xl flex items-center justify-center shadow-lg">
             <span className="text-white font-bold text-lg">R</span>
           </div>
           <div>
@@ -152,12 +152,12 @@ export default function Sidebar() {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                   isActive(item.path)
-                    ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600 font-semibold"
+                    ? "bg-blue-50 text-[#035397] border-r-2 border-[#035397] font-semibold"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
                 <Icon 
-                  className={`text-lg ${isActive(item.path) ? "text-blue-600" : "text-gray-400"}`} 
+                  className={`text-lg ${isActive(item.path) ? "text-[#035397]" : "text-gray-400"}`} 
                 />
                 <span className="font-medium">{item.label}</span>
               </Link>

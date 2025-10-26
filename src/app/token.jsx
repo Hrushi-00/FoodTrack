@@ -216,7 +216,7 @@ const App = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#035397] rounded-full mb-3">
             <Printer className="text-white" size={24} />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -310,7 +310,7 @@ const App = () => {
               </button>
               <button
                 onClick={addNewForm}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Plus size={20} />
                 Add Table
@@ -327,7 +327,7 @@ const App = () => {
               <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <span className="text-blue-600 font-semibold text-sm">{formIndex + 1}</span>
+                    <span className="text-[#035397] font-semibold text-sm">{formIndex + 1}</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800">Table {form.tableNumber || `#${formIndex + 1}`}</h3>
                 </div>
@@ -407,10 +407,10 @@ const App = () => {
                 <button
                   onClick={() => generateToken(form.id)}
                   disabled={loading}
-                  className="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#035397] text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Printer size={18} />
-                  {loading ? 'Generating...' : 'Generate Token'}
+                  {loading ? 'Generating...' : 'Generate Bill'}
                 </button>
               </div>
             </div>
@@ -427,7 +427,7 @@ const App = () => {
             <p className="text-gray-500 mb-4">Get started by adding your first table</p>
             <button
               onClick={addNewForm}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
+              className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
             >
               <Plus size={20} />
               Add First Table

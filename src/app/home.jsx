@@ -169,7 +169,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#035397] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Dashboard...</p>
         </div>
       </div>
@@ -183,7 +183,7 @@ const Dashboard = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
           <div className="mb-6 lg:mb-0">
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-[#035397] rounded-xl flex items-center justify-center shadow-lg">
                 <ChefHat className="text-white" size={24} />
               </div>
               <div>
@@ -197,7 +197,7 @@ const Dashboard = () => {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="text-blue-600" size={20} />
+                <Calendar className="text-[#035397]" size={20} />
               </div>
               <div className="text-right">
                 <p className="text-gray-900 font-semibold text-lg">
@@ -289,7 +289,7 @@ const Dashboard = () => {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600 mb-1">98%</div>
+                <div className="text-2xl font-bold text-[#035397] mb-1">98%</div>
                 <div className="text-blue-700 text-sm">Order Accuracy</div>
               </div>
               
@@ -321,12 +321,12 @@ const Dashboard = () => {
                     <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <span className="text-blue-600 font-bold text-sm">{index + 1}</span>
+                          <span className="text-[#035397] font-bold text-sm">{index + 1}</span>
                         </div>
                         <span className="text-gray-700 font-medium">{item.name}</span>
                       </div>
                       <div className="text-right">
-                        <div className="text-blue-600 font-semibold">{item.orders} orders</div>
+                        <div className="text-[#035397] font-semibold">{item.orders} orders</div>
                         <div className="text-gray-500 text-sm">{item.revenue}</div>
                       </div>
                     </div>
@@ -418,7 +418,7 @@ const Dashboard = () => {
             <button 
               onClick={fetchDashboardData}
               disabled={refreshing}
-              className="text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="text-gray-600 hover:text-[#035397] transition-colors flex items-center gap-2 disabled:opacity-50"
             >
               <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
               {refreshing ? 'Refreshing...' : 'Refresh Data'}

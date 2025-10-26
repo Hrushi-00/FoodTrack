@@ -194,7 +194,7 @@ const Employees = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#035397] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading employees...</p>
         </div>
       </div>
@@ -208,7 +208,7 @@ const Employees = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
           <div className="mb-6 lg:mb-0">
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-[#035397] rounded-xl flex items-center justify-center shadow-lg">
                 <Users className="text-white" size={24} />
               </div>
               <div>
@@ -220,7 +220,7 @@ const Employees = () => {
           
           <button
             onClick={() => setShowAddForm(true)}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <Plus size={20} />
             Add Employee
@@ -326,7 +326,7 @@ const Employees = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 px-4 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Add Employee
                   </button>
@@ -406,7 +406,7 @@ const Employees = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 px-4 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Update Employee
                   </button>
@@ -432,7 +432,7 @@ const Employees = () => {
             {employees.length === 0 && (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
+                className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
               >
                 <Plus size={20} />
                 Add First Employee
@@ -470,7 +470,7 @@ const Employees = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => viewEmployeeDetails(employee._id)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 text-[#035397] hover:bg-blue-50 rounded-lg transition-colors"
                       title="View Details"
                     >
                       <Eye size={18} />
@@ -510,7 +510,7 @@ const Employees = () => {
               <div className="text-sm text-gray-600">Monthly Salary</div>
             </div>
             <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-[#035397]">
                 {new Set(employees.map(emp => emp.position)).size}
               </div>
               <div className="text-sm text-gray-600">Positions</div>
