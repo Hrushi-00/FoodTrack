@@ -558,9 +558,9 @@ const AuthPage = () => {
 
         {/* Footer */}
         <div className="text-center mt-4 sm:mt-6">
-          <p className="text-xs sm:text-sm text-gray-200">
-            © 2024 Restaurant Management System
-          </p>
+          <p className="text-sm text-white/80">
+          © {new Date().getFullYear()} <span className="text-white font-semibold">Food Track</span>. All rights reserved.
+        </p>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 // AboutPage.js
 import { 
   FaArrowLeft, FaQrcode, FaUsers, FaChartBar, 
-  FaShieldAlt, FaUtensils, FaMapMarkerAlt, FaCheckCircle, FaLinkedin, FaTimes
+  FaShieldAlt, FaUtensils, FaMapMarkerAlt, FaCheckCircle, FaLinkedin, FaTimes, FaMailBulk, FaGlobe, FaGithub
 } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -133,19 +133,57 @@ const AboutPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">© {new Date().getFullYear()} Food Track. All rights reserved.</p>
+         <footer className="bg-gray-900 text-gray-300 border-t border-gray-800 py-6">
+      <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        
+        {/* Left Section */}
+        <p className="text-sm text-gray-400">
+          © {new Date().getFullYear()} <span className="text-white font-semibold">Food Track</span>. All rights reserved.
+        </p>
+
+        {/* Center Section */}
+        <div className="flex items-center gap-5">
           <a 
-            href="https://www.linkedin.com/in/YOUR-LINKEDIN-USERNAME" 
+            href="https://www.linkedin.com/in/hrushikesh-kapse/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-white transition-colors duration-300"
+          >
+            <FaLinkedin className="text-blue-400 text-lg" />
+            <span className="hidden sm:inline">LinkedIn</span>
+          </a>
+
+          <a 
+            href="mailto:hrushikesh.kapse@example.com"
+            className="flex items-center gap-2 hover:text-white transition-colors duration-300"
+          >
+            <FaMailBulk className="text-red-400 text-lg" />
+            <span className="hidden sm:inline">Email</span>
+          </a>
+
+          <a 
+            href="https://github.com/Hrushi-00" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-gray-300 hover:text-white mt-3 sm:mt-0"
+            className="flex items-center gap-2 hover:text-white transition-colors duration-300"
           >
-            <FaLinkedin className="text-blue-400" /> LinkedIn
+            <FaGithub className="text-gray-400 text-lg" />
+            <span className="hidden sm:inline">GitHub</span>
+          </a>
+
+          <a 
+            href="https://hrushikesh.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-white transition-colors duration-300"
+          >
+            <FaGlobe className="text-green-400 text-lg" />
+            <span className="hidden sm:inline">Website</span>
           </a>
         </div>
-      </footer>
+
+      </div>
+    </footer>
 
       {/* ✅ Full Image Modal */}
       {selectedImage && (
