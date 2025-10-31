@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 const ResetPassword = () => {
-  const { token } = useParams(); // get token from URL
+  const { token } = useParams(); 
 console.log("Reset token:", token);
 
   const navigate = useNavigate();

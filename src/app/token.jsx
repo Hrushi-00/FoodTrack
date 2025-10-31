@@ -10,7 +10,7 @@ const App = () => {
   const [menu, setMenu] = useState({ items: [] });
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Initialize forms from localStorage or with default value
+  //  localStorage 
   const [forms, setForms] = useState(() => {
     const savedForms = localStorage.getItem('multiTableForms');
     return savedForms ? JSON.parse(savedForms) : [
@@ -22,7 +22,7 @@ const App = () => {
     ];
   });
 
-  // Save forms to localStorage whenever they change
+  // Save forms to localStorage 
   useEffect(() => {
     localStorage.setItem('multiTableForms', JSON.stringify(forms));
   }, [forms]);

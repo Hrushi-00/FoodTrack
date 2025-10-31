@@ -13,7 +13,7 @@ import imageURL5 from '../assets/Employees.png';
 
 const AboutPage = () => {
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(null); // ✅ modal state
+  const [selectedImage, setSelectedImage] = useState(null); //  modal state
 
   const projectImages = [
     { src: imageURL1, title: "Home Dashboard", desc: "Overview of restaurant operations, orders, and analytics in one place." },
@@ -32,7 +32,7 @@ const AboutPage = () => {
     { icon: <FaMapMarkerAlt />, title: "Order Tracking", desc: "Monitor order status in real-time." }
   ];
 
-  // ✅ Close modal on Escape key
+  //  Close modal on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') setSelectedImage(null);
@@ -66,7 +66,7 @@ const AboutPage = () => {
             <div 
               key={i} 
               className="bg-gray-50 border rounded-xl overflow-hidden hover:shadow-md transition cursor-pointer"
-              onClick={() => setSelectedImage(img.src)} // ✅ Open modal
+              onClick={() => setSelectedImage(img.src)} //  Open modal
             >
               <img src={img.src} alt={img.title} className="w-full h-48 object-cover" />
               <div className="p-4">
@@ -185,7 +185,7 @@ const AboutPage = () => {
       </div>
     </footer>
 
-      {/* ✅ Full Image Modal */}
+      {/*  Full Image Modal */}
       {selectedImage && (
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
