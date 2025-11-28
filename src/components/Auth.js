@@ -79,49 +79,56 @@ const AuthPage = () => {
       return;
     }
 
-    try {
-      const response = await fetch(`${API_URL}/api/auth/users/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: signupEmail,
-          password: signupPassword,
-          fullName: signupName,
-          phone: signupPhone,
-          hotelName: signupHotelName,
-          address: signupAddress,
-          role: signupRole
-        }),
-      });
+ // --- SIGNUP SUBMIT FUNCTION ---
+// const handleSignupSubmit = async (e) => {
+//   e.preventDefault();
+//   setLoading(true); // ⬅️ START LOADER
 
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_URL}/api/auth/users/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: signupEmail,
+        password: signupPassword,
+        fullName: signupName,
+        phone: signupPhone,
+        hotelName: signupHotelName,
+        address: signupAddress,
+        role: signupRole
+      }),
+    });
 
-      if (data.success) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.data));
-        localStorage.setItem('isAuthenticated', 'true');
-        
-        alert('Account created successfully! Please login.');
-        setView('login');
-        
-        setSignupEmail('');
-        setSignupPassword('');
-        setSignupConfirmPassword('');
-        setSignupName('');
-        setSignupPhone('');
-        setSignupHotelName('');
-        setSignupAddress('');
-      } else {
-        setErrors(data.errors || { general: data.message });
-      }
-    } catch (error) {
-      setErrors({ general: 'Network error. Please try again.' });
-    } finally {
-      setLoading(false);
+    const data = await response.json();
+
+    if (data.success) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.data));
+      localStorage.setItem('isAuthenticated', 'true');
+
+      alert('Account created successfully! Please login.');
+      setView('login');
+
+      setSignupEmail('');
+      setSignupPassword('');
+      setSignupConfirmPassword('');
+      setSignupName('');
+      setSignupPhone('');
+      setSignupHotelName('');
+      setSignupAddress('');
+    } else {
+      setErrors(data.errors || { general: data.message });
     }
-  };
+
+  } catch (error) {
+    setErrors({ general: 'Network error. Please try again.' });
+  } finally {
+    setLoading(false); // ⬅️ STOP LOADER
+  }
+};
+
 
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
@@ -334,189 +341,185 @@ const AuthPage = () => {
           )}
 
           {/* SIGNUP FORM */}
-          {view === 'signup' && (
-            <form className="space-y-4" onSubmit={handleSignupSubmit}>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={signupName}
-                    onChange={(e) => {
-                      setSignupName(e.target.value);
-                      clearErrors();
-                    }}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.fullName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter your full name"
-                  />
-                  {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
-                </div>
+         {view === 'signup' && (
+  loading ? (
+    // --- LOADER UI ---
+    <div className="flex justify-center items-center py-10">
+      <div className="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  ) : (
+    // --- SIGNUP FORM ---
+    <form className="space-y-4" onSubmit={handleSignupSubmit}>
+      <div className="grid grid-cols-1 gap-4">
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={signupEmail}
-                    onChange={(e) => {
-                      setSignupEmail(e.target.value);
-                      clearErrors();
-                    }}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.email ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter your email"
-                  />
-                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-                </div>
+        {/* Full Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Full Name
+          </label>
+          <input
+            type="text"
+            required
+            value={signupName}
+            onChange={(e) => { setSignupName(e.target.value); clearErrors(); }}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.fullName ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter your full name"
+          />
+          {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={signupPhone}
-                    onChange={(e) => {
-                      setSignupPhone(e.target.value);
-                      clearErrors();
-                    }}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.phone ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter your phone number"
-                  />
-                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-                </div>
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email Address
+          </label>
+          <input
+            type="email"
+            required
+            value={signupEmail}
+            onChange={(e) => { setSignupEmail(e.target.value); clearErrors(); }}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.email ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter your email"
+          />
+          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Restaurant Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={signupHotelName}
-                    onChange={(e) => {
-                      setSignupHotelName(e.target.value);
-                      clearErrors();
-                    }}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.hotelName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter restaurant name"
-                  />
-                  {errors.hotelName && <p className="mt-1 text-sm text-red-600">{errors.hotelName}</p>}
-                </div>
+        {/* Phone Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            required
+            value={signupPhone}
+            onChange={(e) => { setSignupPhone(e.target.value); clearErrors(); }}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.phone ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter your phone number"
+          />
+          {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Address
-                  </label>
-                  <textarea
-                    required
-                    value={signupAddress}
-                    onChange={(e) => {
-                      setSignupAddress(e.target.value);
-                      clearErrors();
-                    }}
-                    rows={2}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.address ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter restaurant address"
-                  />
-                  {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
-                </div>
+        {/* Restaurant Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Restaurant Name
+          </label>
+          <input
+            type="text"
+            required
+            value={signupHotelName}
+            onChange={(e) => { setSignupHotelName(e.target.value); clearErrors(); }}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.hotelName ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter restaurant name"
+          />
+          {errors.hotelName && <p className="mt-1 text-sm text-red-600">{errors.hotelName}</p>}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Role
-                  </label>
-                  <select
-                    required
-                    value={signupRole}
-                    onChange={(e) => {
-                      setSignupRole(e.target.value);
-                      clearErrors();
-                    }}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.role ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="hotel_manager">Restaurant Manager</option>
-                    <option value="User">User</option>
-                  </select>
-                  {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
-                </div>
+        {/* Address */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Address
+          </label>
+          <textarea
+            required
+            value={signupAddress}
+            onChange={(e) => { setSignupAddress(e.target.value); clearErrors(); }}
+            rows={2}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.address ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter restaurant address"
+          />
+          {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showSignupPassword ? "text" : "password"}
-                      required
-                      value={signupPassword}
-                      onChange={(e) => {
-                        setSignupPassword(e.target.value);
-                        clearErrors();
-                      }}
-                      className={`w-full pr-12 px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                        errors.password ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Create a password"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      onClick={() => setShowSignupPassword(!showSignupPassword)}
-                    >
-                      {showSignupPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                  {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-                </div>
+        {/* Role */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Role
+          </label>
+          <select
+            required
+            value={signupRole}
+            onChange={(e) => { setSignupRole(e.target.value); clearErrors(); }}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.role ? 'border-red-500' : 'border-gray-300'
+            }`}
+          >
+            <option value="hotel_manager">Restaurant Manager</option>
+            <option value="User">User</option>
+          </select>
+          {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={signupConfirmPassword}
-                    onChange={(e) => {
-                      setSignupConfirmPassword(e.target.value);
-                      clearErrors();
-                    }}
-                    className={`w-full px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm sm:text-base ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Confirm your password"
-                  />
-                  {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
-                </div>
-              </div>
+        {/* Password */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              type={showSignupPassword ? "text" : "password"}
+              required
+              value={signupPassword}
+              onChange={(e) => { setSignupPassword(e.target.value); clearErrors(); }}
+              className={`w-full pr-12 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                errors.password ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="Create a password"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              onClick={() => setShowSignupPassword(!showSignupPassword)}
+            >
+              {showSignupPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
+          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+        </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#035397] text-white py-2.5 sm:py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
-              >
-                {loading ? 'Creating Account...' : 'Create Account'}
-              </button>
-            </form>
-          )}
+        {/* Confirm Password */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            required
+            value={signupConfirmPassword}
+            onChange={(e) => { setSignupConfirmPassword(e.target.value); clearErrors(); }}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Confirm your password"
+          />
+          {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
+        </div>
+
+      </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-[#035397] text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        {loading ? 'Creating Account...' : 'Create Account'}
+      </button>
+    </form>
+  )
+)}
+
 
           {/* FORGOT PASSWORD FORM */}
           {view === 'forgot' && (
