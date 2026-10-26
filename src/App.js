@@ -1,6 +1,7 @@
 // In src/App.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import Lenis from 'lenis';
 import Home from '../src/app/home';
 import Menu from '../src/app/menu';
 import Contact from '../src/app/contact';
@@ -17,6 +18,19 @@ import EmployeeDetails from './app/employeeDetails';
 import AboutPage from './app/about'; 
 
 function App() {
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return undefined;
+
+    const lenis = new Lenis({
+      autoRaf: true,
+      anchors: true,
+      smoothWheel: true,
+    });
+
+    return () => lenis.destroy();
+  }, []);
+
   return (  
     <div>
       <BrowserRouter>

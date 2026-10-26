@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Plus, X, Printer, Trash2, Search } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL;
+const normalizeSearchText = (value) => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
 
 const App = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [menu, setMenu] = useState({ items: [] });
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearchKey, setActiveSearchKey] = useState(null);
   
   //  localStorage 
   const [forms, setForms] = useState(() => {
@@ -62,6 +64,26 @@ const App = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.menuItemId.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const addMenuItemToFirstTable = (menuItem) => {
+    setForms(prevForms => prevForms.map((form, index) => {
+      if (index !== 0) return form;
+
+      const emptyItemIndex = form.items.findIndex(item => !item.menuItemId);
+      if (emptyItemIndex === -1) {
+        return { ...form, items: [...form.items, { menuItemId: menuItem.menuItemId, qty: 1 }] };
+      }
+
+      return {
+        ...form,
+        items: form.items.map((item, itemIndex) => itemIndex === emptyItemIndex
+          ? { ...item, menuItemId: menuItem.menuItemId }
+          : item)
+      };
+    }));
+    const firstTableLabel = forms[0]?.tableNumber || '1';
+    showMessage('success', `${menuItem.name} added to Table ${firstTableLabel}`);
+  };
 
   // Add new form
   const addNewForm = () => {
@@ -119,7 +141,7 @@ const App = () => {
       prevForms.map(f => {
         if (f.id === formId) {
           const newItems = [...f.items];
-          newItems[index][field] = field === 'qty' ? parseInt(value) || 1 : value.toLowerCase();
+                      newItems[index][field] = field === 'qty' ? parseInt(value) || 1 : value;
           return { ...f, items: newItems };
         }
         return f;
@@ -169,7 +191,10 @@ const App = () => {
         },
         body: JSON.stringify({
           tableNumber: form.tableNumber,
-          items: form.items
+          items: form.items.map(item => ({
+            ...item,
+            menuItemId: item.menuItemId.trim().toLowerCase()
+          }))
         })
       });
 
@@ -233,66 +258,13 @@ const App = () => {
           </div>
         )}
 
-        {/* Menu Preview - Sticky with Search */}
-        <div className="sticky top-4 z-10 bg-white rounded-lg shadow-sm border border-gray-200 p-3 mt-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
-            <h3 className="text-sm font-bold text-gray-800">Menu Preview</h3>
-            
-            {/* Search Input */}
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              <input
-                type="text"
-                placeholder="Search by name or code..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Menu Items Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-2 w-[100%] max-h-60 overflow-y-auto">
-            {filteredMenuItems.length > 0 ? (
-              filteredMenuItems.map((item, index) => (
-                <div key={index} className="border border-gray-200 rounded-md p-2 bg-white hover:shadow-sm transition-shadow">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-mono font-bold text-blue-800 bg-blue-100 px-1 py-0.5 rounded text-xs">
-                      {item.menuItemId}
-                    </span>
-                    <span className="font-bold text-green-600 text-sm">₹{item.price.toFixed(2)}</span>
-                  </div>
-                  <h4 className="font-medium text-gray-800 text-xs">{item.name}</h4>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-4 text-gray-500 text-sm">
-                {searchTerm ? `No menu items found matching "${searchTerm}"` : 'No menu items available'}
-              </div>
-            )}
-          </div>
-          
-          <div className="mt-2 text-center text-xs text-gray-500">
-            {filteredMenuItems.length} of {menu.items.length} menu item{menu.items.length !== 1 ? 's' : ''} shown
-            {searchTerm && ` • Filtered by: "${searchTerm}"`}
-          </div>
-        </div>
-
         {/* Control Bar */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 mb-5">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-center sm:text-left">
-              <h2 className="text-xl font-semibold text-gray-800">Table Orders</h2>
+              <h2 className="text-xl font-semibold text-gray-800">Create table orders</h2>
               <p className="text-gray-500 text-sm mt-1">
-                {forms.length} table{forms.length !== 1 ? 's' : ''} configured • Data auto-saves
+                Step 1: enter table numbers and items. Step 2: generate and print. Orders auto-save.
               </p>
             </div>
             <div className="flex gap-3">
@@ -315,9 +287,9 @@ const App = () => {
         </div>
 
         {/* Table Forms Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {forms.map((form, formIndex) => (
-            <div key={form.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div key={form.id} className="min-w-0 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
               {/* Form Header */}
               <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
@@ -368,33 +340,87 @@ const App = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {form.items.map((item, index) => (
-                      <div key={index} className="flex gap-3 items-center">
-                        <input
-                          type="text"
-                          value={item.menuItemId}
-                          onChange={(e) => updateItem(form.id, index, 'menuItemId', e.target.value)}
-                          placeholder="Item code"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500  text-sm"
-                        />
+                    {form.items.map((item, index) => {
+                      const query = normalizeSearchText(item.menuItemId);
+                      const searchKey = `${form.id}-${index}`;
+                      const exactCodeMatch = query
+                        ? menu.items.find(menuItem => normalizeSearchText(menuItem.menuItemId) === query)
+                        : null;
+                      const suggestions = query
+                        ? exactCodeMatch
+                          ? [exactCodeMatch]
+                          : menu.items
+                            .map(menuItem => {
+                              const code = normalizeSearchText(menuItem.menuItemId);
+                              const name = normalizeSearchText(menuItem.name);
+                              const startsWithMatch = code.startsWith(query) || name.startsWith(query);
+                              const containsMatch = code.includes(query) || name.includes(query);
+                              return { menuItem, code, startsWithMatch, containsMatch };
+                            })
+                            .filter(result => result.containsMatch)
+                            .sort((a, b) => Number(b.startsWithMatch) - Number(a.startsWithMatch))
+                            .slice(0, 4)
+                            .map(result => result.menuItem)
+                        : [];
+
+                      return (
+                      <div key={index} className="grid min-w-0 grid-cols-[minmax(0,1fr)_3.5rem_2rem] gap-2 items-center">
+                        <div className="relative min-w-0">
+                          <input
+                            type="text"
+                            value={item.menuItemId}
+                            onChange={(e) => updateItem(form.id, index, 'menuItemId', e.target.value)}
+                              onFocus={() => setActiveSearchKey(searchKey)}
+                              onBlur={() => setActiveSearchKey(null)}
+                            placeholder="Search item name or code"
+                            autoComplete="off"
+                            aria-label={`Search menu item for row ${index + 1}`}
+                            className="min-w-0 w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          />
+                            {activeSearchKey === searchKey && suggestions.length > 0 && (
+                              <div data-lenis-prevent className="absolute left-0 right-0 top-full z-30 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg">
+                              {suggestions.map(menuItem => (
+                                <button
+                                  type="button"
+                                  key={menuItem.menuItemId}
+                                  onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                      updateItem(form.id, index, 'menuItemId', menuItem.menuItemId);
+                                      setActiveSearchKey(null);
+                                    }}
+                                  className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-blue-50"
+                                >
+                                  <span className="min-w-0">
+                                    <span className="block truncate text-sm font-medium text-gray-800">{menuItem.name}</span>
+                                    <span className="text-xs text-gray-500">Code: {menuItem.menuItemId}</span>
+                                  </span>
+                                  <span className="shrink-0 text-xs font-semibold text-green-700">₹{menuItem.price.toFixed(2)}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                         <input
                           type="number"
                           value={item.qty}
                           onChange={(e) => updateItem(form.id, index, 'qty', e.target.value)}
                           placeholder="Qty"
                           min="1"
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          aria-label={`Quantity for item ${index + 1}`}
+                          className="min-w-0 w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                         />
                         {form.items.length > 1 && (
                           <button
                             onClick={() => removeItem(form.id, index)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            aria-label={`Remove item ${index + 1}`}
+                            className="w-8 h-9 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                           >
                             <X size={16} />
                           </button>
                         )}
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -405,11 +431,73 @@ const App = () => {
                   className="w-full py-3 bg-[#035397] text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Printer size={18} />
-                  {loading ? 'Generating...' : 'Generate Bill'}
+                  {loading ? 'Generating token...' : 'Generate & Print Token'}
                 </button>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Searchable menu picker */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
+            <div>
+              <h3 className="text-sm font-bold text-gray-800">Menu items</h3>
+              <p className="text-xs text-gray-500 mt-1">Select an item to add it to the first table above.</p>
+            </div>
+            
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <input
+                type="text"
+                placeholder="Search by name or code..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Menu Items Grid */}
+          <div data-lenis-prevent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-2 w-[100%] max-h-40 overflow-y-auto">
+            {filteredMenuItems.length > 0 ? (
+              filteredMenuItems.map((item) => (
+                <button
+                  type="button"
+                  key={item.menuItemId}
+                  onClick={() => addMenuItemToFirstTable(item)}
+                  title={`Add ${item.name} to the first table`}
+                  className="text-left border border-gray-200 rounded-md p-2 bg-white hover:border-blue-400 hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <span className="font-mono font-bold text-blue-800 bg-blue-100 px-1 py-0.5 rounded text-xs">
+                      {item.menuItemId}
+                    </span>
+                    <span className="font-bold text-green-600 text-sm">₹{item.price.toFixed(2)}</span>
+                  </div>
+                  <h4 className="font-medium text-gray-800 text-xs">{item.name}</h4>
+                </button>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-4 text-gray-500 text-sm">
+                {searchTerm ? `No menu items found matching "${searchTerm}"` : 'No menu items available'}
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-2 text-center text-xs text-gray-500">
+            {filteredMenuItems.length} of {menu.items.length} menu item{menu.items.length !== 1 ? 's' : ''} shown
+            {searchTerm && ` • Filtered by: "${searchTerm}"`}
+          </div>
         </div>
 
         {/* Empty State */}

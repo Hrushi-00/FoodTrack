@@ -11,6 +11,8 @@ const MenuManagement = () => {
   const [isNewMenu, setIsNewMenu] = useState(false);
   const [menu, setMenu] = useState({ items: [] });
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMenuItemId, setSelectedMenuItemId] = useState(null);
+  const [editingMenuItem, setEditingMenuItem] = useState(null);
 
   // Get JWT token from localStorage
   const getAuthToken = () => localStorage.getItem('token');
@@ -64,6 +66,59 @@ const MenuManagement = () => {
   const editExistingMenu = () => {
     setIsNewMenu(false);
     setEditing(true);
+  };
+
+  const editMenuItem = (item) => {
+    setSelectedMenuItemId(item.menuItemId);
+    setEditingMenuItem({ ...item });
+  };
+
+  const saveMenuItem = async () => {
+    const updatedItem = {
+      ...editingMenuItem,
+      menuItemId: editingMenuItem.menuItemId.trim().toLowerCase(),
+      name: editingMenuItem.name.trim(),
+      price: Number(editingMenuItem.price)
+    };
+
+    if (!updatedItem.menuItemId || !updatedItem.name || updatedItem.price <= 0) {
+      showMessage('error', 'Please enter a code, item name, and price greater than 0');
+      return;
+    }
+
+    const updatedItems = menu.items.map(item =>
+      item.menuItemId === selectedMenuItemId ? updatedItem : item
+    );
+    if (new Set(updatedItems.map(item => item.menuItemId)).size !== updatedItems.length) {
+      showMessage('error', 'Menu item codes must be unique');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/menu/updatemenu`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify({ ...menu, items: updatedItems })
+      });
+
+      if (response.ok) {
+        setMenu({ ...menu, items: updatedItems });
+        setEditingMenuItem(null);
+        setSelectedMenuItemId(null);
+        showMessage('success', 'Menu item updated successfully');
+      } else {
+        const errorData = await response.json();
+        showMessage('error', errorData.message || 'Failed to update menu item');
+      }
+    } catch (error) {
+      showMessage('error', 'Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Cancel editing
@@ -227,7 +282,7 @@ const MenuManagement = () => {
       className="px-6 py-3 bg-[#035397] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
     >
       <Edit size={20} />
-      Edit Current Menu
+      Edit Multiple Items
     </button>
   );
 
@@ -285,6 +340,7 @@ const MenuManagement = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Menu Preview</h3>
+                <p className="text-sm text-gray-500 mb-3">Select an item to edit it.</p>
                 
                 {/* Search Input */}
                 <div className="relative w-full max-w-md">
@@ -322,8 +378,14 @@ const MenuManagement = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredMenuItems.length > 0 ? (
-                filteredMenuItems.map((item, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                filteredMenuItems.map((item) => (
+                  <button
+                    type="button"
+                    key={item.menuItemId}
+                    onClick={() => editMenuItem(item)}
+                    className="w-full text-left border border-gray-200 rounded-lg p-4 bg-white hover:border-blue-400 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title={`Edit ${item.name}`}
+                  >
                     <div className="flex justify-between items-start mb-3">
                       <span className="font-mono font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-lg text-sm">
                         {item.menuItemId}
@@ -331,7 +393,7 @@ const MenuManagement = () => {
                       <span className="font-bold text-green-600 text-lg">₹{item.price.toFixed(2)}</span>
                     </div>
                     <h4 className="font-semibold text-gray-800">{item.name}</h4>
-                  </div>
+                  </button>
                 ))
               ) : (
                 <div className="col-span-full text-center py-8 text-gray-500">
@@ -347,6 +409,7 @@ const MenuManagement = () => {
         )}
 
         {/* Main Card */}
+        {(editing || menu.items.length === 0) && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {/* Header with Actions when editing or no menu */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -409,7 +472,10 @@ const MenuManagement = () => {
           ) : (
             <div className="space-y-4">
               {menu.items.map((item, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-sm transition-shadow">
+                <div
+                  key={item.menuItemId || index}
+                  className={`border rounded-lg p-4 bg-white transition-shadow ${selectedMenuItemId === item.menuItemId ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200 hover:shadow-sm'}`}
+                >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
                     {/* Menu Item Code */}
                     <div className="lg:col-span-2">
@@ -517,6 +583,92 @@ const MenuManagement = () => {
             </div>
           )}
         </div>
+        )}
+
+        {editingMenuItem && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => !loading && setEditingMenuItem(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-menu-item-title"
+              className="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl sm:p-6"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <h2 id="edit-menu-item-title" className="text-xl font-bold text-gray-900">Edit menu item</h2>
+                  <p className="mt-1 text-sm text-gray-500">Update the item details and save your changes.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingMenuItem(null)}
+                  disabled={loading}
+                  aria-label="Close edit dialog"
+                  className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="edit-item-code" className="mb-1 block text-sm font-medium text-gray-700">Item code</label>
+                  <input
+                    id="edit-item-code"
+                    type="text"
+                    value={editingMenuItem.menuItemId}
+                    onChange={(event) => setEditingMenuItem({ ...editingMenuItem, menuItemId: event.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 font-mono focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="edit-item-name" className="mb-1 block text-sm font-medium text-gray-700">Item name</label>
+                  <input
+                    id="edit-item-name"
+                    type="text"
+                    value={editingMenuItem.name}
+                    onChange={(event) => setEditingMenuItem({ ...editingMenuItem, name: event.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="edit-item-price" className="mb-1 block text-sm font-medium text-gray-700">Price (Rs.)</label>
+                  <input
+                    id="edit-item-price"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={editingMenuItem.price}
+                    onChange={(event) => setEditingMenuItem({ ...editingMenuItem, price: event.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setEditingMenuItem(null)}
+                  disabled={loading}
+                  className="rounded-lg border border-gray-300 px-4 py-2.5 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={saveMenuItem}
+                  disabled={loading}
+                  className="rounded-lg bg-[#035397] px-4 py-2.5 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {loading ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
