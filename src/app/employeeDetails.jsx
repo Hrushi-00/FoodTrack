@@ -195,12 +195,16 @@ const EmployeeDetails = () => {
     if (employeeId) {
       fetchEmployeePaymentDetails(); // Load initial data with payment details
     }
+    // Initial payment data is loaded when the route's employee ID changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId]);
 
   useEffect(() => {
     if (employeeId && employee) {
       fetchEmployeeData();
     }
+    // Reload the selected report when the active tab changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   if (loading) {

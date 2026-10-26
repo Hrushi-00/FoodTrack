@@ -204,6 +204,8 @@ const MenuManagement = () => {
   // Load menu on component mount
   useEffect(() => {
     fetchMyMenu();
+    // Fetch once when the menu screen mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Separate button components for better organization

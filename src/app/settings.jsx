@@ -185,6 +185,8 @@ const Settings = () => {
 
   useEffect(() => {
     fetchProfile();
+    // Fetch once when settings mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

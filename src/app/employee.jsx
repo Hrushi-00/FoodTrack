@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Users, 
-  IndianRupee, 
-  Calendar,
   Phone,
   Briefcase,
   Eye,
@@ -188,6 +186,8 @@ const Employees = () => {
 
   useEffect(() => {
     fetchEmployees();
+    // Fetch once when the employee screen mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {

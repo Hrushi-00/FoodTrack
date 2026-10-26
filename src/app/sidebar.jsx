@@ -3,7 +3,6 @@ import {
   FaBars, 
   FaTimes, 
   FaHome, 
-  FaUser, 
   FaCog, 
   FaSignOutAlt,
   FaQrcode,

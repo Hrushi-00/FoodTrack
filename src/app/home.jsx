@@ -10,7 +10,6 @@ import {
   RefreshCw,
   ArrowRight,
   Clock,
-  Star,
   Package
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -126,6 +125,8 @@ const Dashboard = () => {
   // Fetch data on component mount
   useEffect(() => {
     fetchDashboardData();
+    // Fetch once when the dashboard mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => (

@@ -6,7 +6,6 @@ const API_URL = process.env.REACT_APP_API_URL;
 const App = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  const [isNewMenu, setIsNewMenu] = useState(false);
   const [menu, setMenu] = useState({ items: [] });
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -48,10 +47,8 @@ const App = () => {
       if (response.ok) {
         const data = await response.json();
         setMenu(data);
-        setIsNewMenu(data.items.length === 0);
       } else {
         setMenu({ items: [] });
-        setIsNewMenu(true);
       }
     } catch (error) {
       showMessage('error', 'Failed to fetch menu');
@@ -202,13 +199,11 @@ const App = () => {
     }
   };
 
-  const cancelEditing = () => {
-    fetchMyMenu();
-  };
-
   // Load menu on component mount
   useEffect(() => {
     fetchMyMenu();
+    // Fetch once when the token screen mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Search, Printer, Download, Filter, ChevronDown, ChevronUp, List, X } from 'lucide-react';
+import { Calendar, Search, Printer, Download, ChevronDown, ChevronUp, List, X } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -147,6 +147,8 @@ const TokenViewer = () => {
     } else if (activeTab === 'all') {
       fetchAllTokens();
     }
+    // These fetches intentionally run when the selected tab changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   // Get unique table numbers for filter
